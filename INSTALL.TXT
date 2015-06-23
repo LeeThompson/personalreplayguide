@@ -1,0 +1,750 @@
+Personal ReplayGuide 
+(C) 2003 by Lee Thompson <thompsonl@logh.net>
+Includes contributions by Philip Van Baren, Kanji T. Bates, Kevin J. Moye, J.M. and Rick Quartarone
+
+Thanks to Todd Larason, and Matthew Linehan.
+
+
+Personal ReplayGuide is a package of Perl scripts designed to provide a local, personal, web-based tvlistings service directly integrated with ReplayTVs running the 5.0 software.   (4.x versions of the software cannot remotely schedule programming.)   ReplayTV support is optional.
+
+NOTE: All cross platform files are LF only and thus may not format properly in notepad.    http://www.winvi.de is a text editor for Win32 that can handle both formats and convert between them.
+
+
+________________
+PROJECT HOMEPAGE
+
+http://replayguide.sourceforge.net
+http://replayguide.sourceforge.net/replaySchedule
+http://sourceforge.net/projects/replayguide/
+
+
+_____
+LEGAL
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+_________
+IMPORTANT
+
+This document as well as the installation and configuration of this software is not for novice users.     While I'm happy to help if you should run into a bug or even have a feature request or two I cannot help you install and configure the software beyond this document.
+
+For additional assistance you might try the appropriate forums at http://www.avsforum.com or http://www.planetreplay.com
+
+Please do not email the authors with support questions regarding Personal ReplayGuide (bug reports and feature requests are ok, however).
+
+
+
+____________
+REQUIREMENTS
+
+Personal ReplayGuide is dependant on five other software packages:
+	1. Perl 
+	2. (Optional) A supported database server (such as MySQL or Microsoft SQL; see Databases for more info)
+	3. A web server capable of using CGI (Common Gateway Interface)
+	4. XMLTV or a DataDirect Account*
+	5. (Optional) replaySchedule
+
+These must all be installed and properly configured before Personal ReplayGuide can be installed and configured.   
+In general the best install order is: Web Server, Perl, Database (if required), DataFeed, replaySchedule (if required)
+
+Other sources of TV listing data may be adapted to this program using xmltv2sql or datadirect2sql as a guide.
+
+
+________________
+NOTE ABOUT XMLTV
+
+Starting with 0.5.31, XMLTV now includes a DataDirect grabber.   This new grabber is *NOT* supported by Personal ReplayGuide, please use the native DataDirect support instead.    They can both, however, use the same DataDirect account.
+
+The XMLTV team has also stated that a future release of XMLTV will drop the tv_grab_na grabber (which scrapes the listings.zap2it.com website).  The current tv_grab_na support in Personal ReplayGuide will be left in, at the very least until the tv_grab_na grabber in legacy versions of XMLTV no longer works.
+
+
+_________
+DATABASES
+
+Personal ReplayGuide now supports SQLite out of the box since it does not require any software installation.   The database file is included (tvlistings without a file extension), all you need to do is make sure the DBD::SQLite Perl module is installed.
+
+Currently PRG supports SQLite, MySQL and Microsoft SQL databases in terms of testing, making SQL statements and providing .sql scripts to create the tables.    
+
+Other DBMS packages will probably work but may require manual creation of tables and/or modifications to the SQL statements.
+
+Consult Perl documentation for more information on DBI and DBD (and what drivers are available).
+
+
+Tips on Modifications:
+
+1. All SQL statements are always set up in a $Stmt variable before being passed.
+2. The DBI/DBD database driver is always available in the '$db_driver' variable, this allows for conditional $Stmt building. 
+
+For example, in xmltv2sql we need to do a conditional Stmt build because of a difference between MSSQL and MySQL's SELECT with a limited number of records syntax.
+
+if ($db_driver eq "mysql") {
+	$Stmt = "SELECT * FROM tvlistings WHERE (programid <> '$programid' AND starttime > '$starttime') AND tuning = $tuning ORDER BY tuning, starttime LIMIT 1;";
+}
+
+if ($db_driver eq "ODBC") {
+	$Stmt = "SELECT TOP 1 * FROM tvlistings WHERE (programid <> '$programid' AND starttime > '$starttime') AND tuning = $tuning ORDER BY tuning, starttime;";
+}
+
+
+IMPORTANT ODBC NOTE: Your ODBC DSN name should be the same as the database name and it should change to the database automatically. 
+
+
+Database speed can be greatly increased (by a factor of 10 or more) and disk usage greatly decreased by making sure transaction logging and rollback capabilities are disabled for the database.   The major tables: tvlistings, channels, castcrew are purged and repopulated whenever tvdata is refreshed.   All these normally useful journaling features will do is take up huge amounts of disk space and slow things down.   If you experience some type of power failure and the database is corrupted just recreate the database, add your ReplayTVs  back in (it would make some sense to backup this table for this problem if you have more than one or two units) and run the tvdata update.      
+
+The database creation scripts for SQLite automatically disable all the transaction logging for PRG's database.   Other DBMS packages may need configuration.
+
+The sqlconfig Perl script can create databases and tables and can also upgrade tables.
+
+VERY IMPORTANT: If you are using alternate database and/or table names you *MUST* enable 'allowsqlsubstitutions' in the prg.conf for sqlconfig to work.   (You may, alternately, modify the .sql scripts.)
+
+
+
+
+____________________
+REPLAYTV INTEGRATION
+
+If you happen to have a ReplayTV you can define them to be available to Personal ReplayGuide.
+
+Versions running 5.0 and greater of the ReplayTV OS can remotely schedule programming, prior versions will only show what is scheduled in the Personal ReplayGuide channel grid.
+
+The replaySchedule/rg_scheduler module can also greatly enhance ReplayTV/PRG integration.
+
+
+
+________________________________
+WHERE TO FIND DEPENDANT SOFTWARE
+
+Perl can be found at http://www.perl.com or http://www.activeperl.com.   Personal ReplayGuide was designed and tested with ActivePerl 5.6.1 Build 635.
+
+MySQL is a database server that can be found at http://www.mysql.com.  It is free for personal use.   Personal ReplayGuide was designed and tested with MySQL 3.22.   
+
+XMLTV can be found at http://membled.com/work/apps/xmltv/.  It has been ported to most operating systems including Win32.   XMLTV v6 will be changing the file format, this will break Personal ReplayGuide which is developed with XMLTV v0.5.14.
+Personal ReplayGuide was tested and designed on an IIS 5.0 web server.  It should also work just fine with Apache and others.
+
+You don't have to download the SQLite management tool unless you want to run SQL scripts manually or make changes to the database.  You can find information on SQLite and download the tools at http://www.hwaci.com/sw/sqlite.
+
+You can get replaySchedule from http://replayguide.sourceforge.net/replaySchedule/ it is available as source, windows binary and linux binary.     This version of Personal ReplayGuide requires replaySchedule 116.26 or greater if you wish to use replaySchedule and the rg_scheduler.pl module.
+
+
+
+__________ 
+DATADIRECT
+
+Zap2It DataDirect Service
+
+Use of DataDirect with Personal ReplayGuide is free, although you will need to fill out a quarterly survey for Zap2It (Tribune Media Services).
+
+To sign up for the service, please visit http://datadirect.zap2it.com and click on "New User? Sign-Up".     You will need to  accept the "TRIBUNE MEDIA SERVICES LICENSED DATA SUBSCRIBER AGREEMENT".  
+
+You will also need to fill out the initial survey which is also a requirement to use the DataDirect service for free.    It's fairly short and largely related to PVRs and television anyway.   
+
+The DataDirect Personal ReplayGuide/ReplaySchedule Certificate Code is DGYM-ZKZM-CBUT
+
+All users and developers for Personal ReplayGuide may use this certificate code.
+
+NOTE TO DEVELOPERS: DO NOT use the certificate code within this document for non Personal ReplayGuide projects.   Instead please write to labs@zap2it.com and request your own certificate code.
+
+If you already have a DataDirect account, you can use it with Personal ReplayGuide.
+
+
+
+_____________
+FILE MANIFEST
+
+LICENSE.TXT			Gnu Public License (GPL)
+INSTALL.TXT			This Document
+FUTURE.TXT			Possible Future Enhancements
+README.TXT			Project Description
+CHANGELOG.TXT			Revision History
+SUPPORT.TXT			Support Policies
+
+prg.conf.dist			Configuration File Original (copy to prg.conf and edit)
+replayguide.conf.dist		Sample replayguide.conf (no longer used if prg.conf exists)
+schd2sql.conf.dist		Sample schd2sql.conf (no longer used if prg.conf exists)
+schedule.conf.dist		Sample schedule.conf (not used with PRG)
+datadirect.conf.dist		Sample datadirect.conf (not used if prg.conf exists)
+datadirect2sql.conf.dist	Sample datadirect2sql.conf (not used if prg.conf exists)
+xmltv2sql.conf.dist		Sample xmltv2sql.conf (not used if prg.conf exists)
+
+configure.pl			Script for Configuring ReplayTVs for Personal ReplayGuide
+datadirect_client.pl		Script for Downloading DataDirect TV Data
+datadirect2sql.pl		Script for Converting DataDirect Data to SQL
+getchannelicons.pl		Script to Download Channel Icons
+replayguide.pl			Script for Personal ReplayGuide
+rg_common.pl			Common Function Library for Personal ReplayGuide
+rg_config.pl			Configuration Function Library for Personal ReplayGuide
+rg_database.pl			Database Function Library for Personal ReplayGuide
+rg_guide.pl			Native scheduler module for Personal ReplayGuide
+rg_info.pl			ReplayTV Database Information Library for Personal ReplayGuide
+rg_null.pl			ReplayTV Integration Null Stub (for when RTV support is off)
+rg_refresh.pl			ReplayTV GuideSnapshot Batch Refresh Script for Personal ReplayGuide
+rg_replay.pl			ReplayTV Integration Functions for Personal ReplayGuide
+rg_scheduler.pl			replaySchedule scheduler module for Personal ReplayGuide
+schedule.pl			Script for ReplayTV Recording Scheduler 
+schedule2sql.pl			Script for Converting replaySchedule output to SQL
+sqlconfig.pl			Script for Configuring SQL (ODBC, SQLite, mysql) - the .sql files must be present.
+updatetvdata.pl			Script for Running the DataFeed Client and then Converter.  Works for all DataFeeds.  Can also be set to run getchannelicons for you.
+xmltv2sql.pl			Script for Converting XMLTV to SQL
+
+configure.bat			Runs configure.pl
+datadirect_update.bat		DataDirect Download / Convert Batch File
+geticons.bat			Downloads Icons from www.MyReplay.com
+setup_perl.bat			Installs Perl Modules
+updatetvdata.bat		Runs updatetvdata.pl
+xmltv_update.bat		XMLTV Download / Convert Batch File
+
+
+tvlistings_mysql.sql		SQL Script for Creating the TVLISTINGS Database Tables for MySQL*
+tvlistings_mssql.sql		SQL Script for Creating the TVLISTINGS Database Tables for Microsoft SQL*
+tvlistings_sqlite.sql		SQL Script for Creating the TVLISTINGS Database Tables for SQLite*
+
+upgrade_mssql.sql		SQL Script for Upgrading MSSQL PRG Database from build 195 to build 198*
+upgrade_mysql.sql		SQL Script for Upgrading MySQL PRG Database from build 195 to build 198*
+
+* sqlconfig will run these for you.
+
+
+
+_____________________
+REQUIRED PERL MODULES
+
+POSIX*
+CGI*
+Time::Local*
+LWP*
+DBI
+DBD::SQLite (Required if using SQLite)
+DBD::mysql (Required if using MySQL)
+DBD::ODBC (Required if using any other DB engine other than MySQL if using ODBC)
+DBD::?? (Not supported officially, good luck ;)  -  see "Databases")
+SOAP::Lite (Required if using DataDirect)
+Unicode::String* (Required if using Datadirect)
+
+* denotes standard with ActiveState ActivePerl.
+
+
+Consult your Perl distribution's documentation for how to install modules.   Generally it's in the form of "ppm install modulename".  
+
+NOTE: Other modules may be required for XMLTV (on non-win32 platforms).
+NOTE: There is no harm in having multiple DBD drivers (eg. DBD::MySQL) installed.
+NOTE: As of the date of this file, the ActiveState PPM repository does not have a working version of DBD-SQLite for Perl 5.8 on the Win32 platform.  Worse, it may appear to install when it actually does not.  You can either use Perl 5.6, which does have a working version, OR use  "ppm install http://theoryx5.uwinnipeg.ca/ppms/DBD-SQLite.ppd" to get a working version of DBD-SQLite for Perl 5.8.
+WIN32: Change "::" to "-" when trying to install modules with ActivePerl.
+TIP: Some of the beta testers for this program have said that you're better off using stock Perl 5.6.1 instead of ActivePerl on Linux.
+
+
+
+_______
+UPGRADE
+
+If you are upgrading from a prior build of Personal ReplayGuide, there are SQL scripts for altering the databases.  Individual conf files are still used if the prg.conf cannot be found (or the section is missing).  There's a lot of new stuff so reconfiguring it might be a good idea.
+
+
+____________
+INSTALLATION
+
+NOTE: If transferring to a Unix based system, you will want to FTP the files in ASCII mode, not BINARY.   This will strip the extra CRLF pairs.
+
+Environment Variables: 
+	These are both optional.
+
+	PRG_HOME is the path for where all the Personal ReplayGuide perl and other files are located.
+	PRG_CONFPATH is where the prg.conf file is located.   A trailing slash is required.   If this isn't set, the rg_config module will *always* look in the same directory as rg_config.pl.
+
+
+BEFORE YOU BEGIN you will need to have a web server up and running and set up a script (CGI execute) path on it.  
+
+
+Step 1: Copying Files
+
+	1. The .pl files will all need to be copied into a directory where appropriate permissions have been set to allow the execution of scripts.    The files "rg_common.pl", "rg_database.pl", "rg_info.pl" and "rg_guide.pl" can be located anywhere in Perl's @INC path.  If you don't know what I'm talking about, leave them with the others.
+	2. Copy the prg.conf.dist file to the same directory as step 1.
+	3. Next, copy or rename "prg.conf.dist" to "prg.conf". 
+	4. (Optional) You must have the replaySchedule.exe program installed in the same directory as rg_scheduler.pl
+
+
+
+Step 2: Database
+
+	If you plan on just using SQLite and the required Perl module is installed, you can skip this step.
+
+	There is also now a sqlconfig.pl utility which will do the database and table creation for you, it will also upgrade existing tables.   
+
+	There are one prerequisite:
+		1. The [database] section of the prg.conf must be correct.
+
+	To invoke type "perl sqlconfig.pl" at the command line, you may also just double click on "sqlconfig.pl" on Windows.
+	
+	
+Step 2A: MySQL Setup
+
+	Next, we need to set up the MySQL database and tables.   
+
+	1. Login to your MySQL server (consult MySQL documentation)
+	2. Create the database.   Type "source <path>/createdb.sql".  Substitute path for where your Personal ReplayGuide files are located. (eg. "source c:\install\replayguide\createdb.sql")
+	3. Create the tables.     Type "source <path>/tvlistings_mysql.sql".  Again, substitute path for where your Personal ReplayGuide files are located.
+	4. Edit "prg.conf" and under [database] set the driver and login credentials.  If need be you can edit "host" as well.
+
+	example:
+		driver=mysql
+		username=myuser
+		password=mypass
+
+
+
+Step 2B: Microsoft SQL Setup
+
+	Next, we need to set up the Microsoft SQL database and tables.   
+
+	1. Connect to the database with the Microsoft SQL Query Analyzer
+	2. run 'createdb.sql' (or create a database called 'tvlistings' manually)
+	3. run 'tvlistings_mssql.sql'
+	4. Create an ODBC System DSN called 'tvlistings'
+	5. Edit "prg.conf" and under [database] set the driver and login credentials.  If need be you can edit "host" as well.
+
+	example:
+		driver=ODBC
+		username=myuser
+		password=mypass
+
+
+	NOTE: Other ODBC based databases may work too but the scripts may require some editing.
+
+
+Step 3: Select and Configure a Data Feed
+
+	Next, decide between XMLTV or DataDirect for your listing provider.  Both are free.  
+
+	DataDirect does require a quarterly questionnaire to use the service, but is orders of magnitude faster than XMLTV.  
+
+	XMLTV on the other hand doesn't require any registration.
+
+	XMLTV NOTE: The tv_grab_na_dd grabber is not supported.
+
+
+
+Step 3A: XMLTV
+
+	1. Install and configure XMLTV
+	2. Edit prg.conf and in the [global] section enter 'xmltv' for "datafeed".  (eg. datafeed=xmltv)   You will also need to specify an xmlfile, you may include a complete pathname if you wish.
+	3. Download some TVlistings using the xmltv_update.bat file (WIN32) or by invoking:
+		
+		xmltv tv_grab_na --days 12 > na.xml
+		perl xmltv2sql.pl
+
+	   Change "na.xml" to whatever you put for the 'xmlfile' field.
+
+	
+	This process will likely take between 1-2 hours (yes, hours) depending on the speed of your internet connection and computer.   If you already have a complete set of listings you can skip running xmltv again.
+
+	NOTE: You might want to start with only 2 days of data, to do this invoke xmltv with --days 2 instead of --days 12.
+	NOTE: Each time you run xmltvsql it will delete all content of the channel and tvlistings tables.
+
+	If you have multiple headends (i.e. antenna + directv etc), you can specify multiple .xml files in the configuration file - separate them with a comma (eg. antenna.xml,directv.xml)
+
+	WARNING: In various tests on Windows, MySQL consumed a lot of CPU when processing multiple headends.   
+
+
+Step 3B: DataDirect
+
+	1. Sign Up for DataDirect and Create a Lineup
+	2. Edit prg.conf and in the [global] section enter 'datadirect' for "datafeed".  (eg. datafeed=datadirect)   You will also need to specify an xmlfile, you may include a complete pathname if you wish.
+	3. Also in the prg.conf file under the [datadirect] section enter the username and password for your DataDirect account.
+	4. Download some TVlistings using the datadirect_update.bat file (WIN32) or by invoking:
+
+		perl datadirect_client.pl
+		perl datadirect2sql.pl
+
+	By default this will download 12 days of data unless you specified otherwise.   Assuming you have a broadband connection, the data download will take approximately two minutes and the database import will take another 15-20 minutes.
+
+	
+Step 4: Configure Personal ReplayGuide
+
+	First we need to set up Personal ReplayGuide to integrate with your ReplayTVs.
+	NOTE: Should you add (or remove) ReplayTVs in the future, you will need to rerun this script.
+
+	1. From a command window, run the configure.bat file (or invoke the configure.pl script yourself).
+	3. You will need to edit prg.conf files.  At the very least, under [global] the scripts directory needs to be the virtual directory where your web server is configured to run scripts from.
+	
+	NOTE: If you don't have a ReplayTV, you can skip this step.
+
+
+
+Step 5: Optional but Recommended 
+	
+	1. You will, at some point, probably want to set up a scheduled event to run your data feed programs at an interval of your choosing.   There are batch files provided you can also just updatetvdata.pl which will automatically run the datafeed software and then the required SQL converter.
+	2. It might be wise to limit those that can access Personal ReplayGuide.    Even if you've locked down who can schedule a program on your ReplayTVs, you might not want others to see what you have scheduled.
+	3. On Win32 with IIS you may get better performance if you rename "schedule.pl" and "replayguide.pl" to "schedule.plx" and "replayguide.plx".   The prg.conf file will need to be edited reflecting this change.
+	4. If your web server is open to the internet "at large" be sure to secure it properly and keep up on patches.
+	5. All of the options available to PRG are fully documented in the .conf file, be sure to take a look!
+
+You are now ready to run Personal ReplayGuide!
+
+
+
+______________
+replaySchedule
+
+The default ReplayTV integration is fairly limited in it's capabilities.    For superior conflict checking and other features such as To Do lists and more you will need to change scheduler modules.
+
+1. Download and install "replaySchedule".   The binary will need to be placed in the same directory as Personal ReplayGuide.
+2. Edit the prg.conf:
+	a. Under [global] change scheduler=rg_guide.pl to scheduler=rg_scheduler.pl
+	b. Under [global] add schedule2sql=schedule2sql.pl
+	c. Under [replayguide] change refreshinterval=15 to refreshinterval=0
+	d. Under [schedule2sql] ensure that replayschedule=./replaySchedule.exe is present 
+3. Two things will cause the replayschedule.exe process to run, 
+	a) a manual refresh under the web server's security context 
+	b) after data feed conversion to SQL.   Make sure permissions are set accordingly in both cases!
+
+
+
+
+____________________________
+RUNNING PERSONAL REPLAYGUIDE
+
+
+Simply load up your favorite web browser and type in:
+
+	http://YOUR_WEB_SERVER_ADDRESS/YOUR_CGI_SCRIPT_DIR/replayguide.pl
+
+eg.
+	http://192.168.0.1/cgi/replayguide.pl
+
+	or
+
+	http://myserver/cgi/replayguide.pl
+
+
+
+
+_______________
+TROUBLESHOOTING
+
+
+ALL PLATFORMS
+
+
+1. Try to run "replayguide.pl" directly from a command line prompt, see if there are any errors.     If it appears to have valid data and is complete, the problem is more likely with the web server settings.
+
+2. Check Personal ReplayGuide's configuration file, prg.conf.   Ensure that the database section is set up properly.
+
+3. If it freezes at the header in both the web browser and when you run it from the command line chances are it is having trouble contacting the database server.
+
+4. Enable and check the log file.
+
+5. Enable debug mode.
+
+	
+
+WINDOWS
+
+1. Make sure the virtual directory you created for replayguide's scripts has read and execute permissions.
+
+2. If you installed ActivePerl before IIS, make sure .pl is mapped properly to the Perl executeable (check ActivePerl documentation for specifics).
+
+3. If you're using MS SQL, make sure that you have a system DSN called "tvlistings" that is pointing to the SQL server (does not have to be on the same box) and that it automatically changes the active database to "tvlistings".
+
+4. If you change to the ISAPI filter (.plx) be sure to update the .conf to reflect the proper filenames.  I've noticed that DLLHOST leaks memory with ActiveState's Perl.  Use caution.
+
+
+
+UNIX
+
+1. This was developed on a Windows platform so the various files may have CRLF patterns.  You'll need to use a utility to strip the CR characters.
+
+2. You will probably need to adjust the #! line at the top of the scripts to point to your Perl interpreter.
+
+3. Some Perl modules may not install directly from CPAN, check your ports collection if you experience a failed install.
+
+
+_____________
+LISTINGS NOTE
+
+Sometimes shows differ slightly in name on zap2it's listings and on the Replay.  If this occurs you will not be able to schedule it by just clicking on the title.   For example, zap2it lists Lois & Clark as "Lois & Clark: The New Adventures of Superman" but on the ReplayTV channel guide, it's listed as "Lois & Clark: New Adventures of Superman".
+
+
+________
+XML DATA
+
+There may be some differences in the way the Replay and datafeed see a show title.  This can cause the scheduling to fail.
+
+The data feed SQL converters include remappers which can be configured in the prg.conf under the section for your data feed.   It is under ADVANCED OPTIONS.
+
+
+_____________
+titlemap.conf
+
+Format is OLD TITLE=NEW TITLE, one per line.
+
+Example:
+
+To change "Lois & Clark: The New Adventures of Superman" to "Lois & Clark: New Adventures of Superman" you would add the following to your titlemap file:
+
+Lois &amp; Clark: The New Adventures of Superman=Lois &amp; Clark: New Adventures of Superman
+
+_______________
+channelmap.conf
+
+This allows for a channel number to be remapped and/or the call letters to be altered.
+
+Format is OLD_CHANNELID,OLD_TUNING=NEW_CHANNELID,NEW_TUNING
+
+
+Example:
+
+To remap "57 TNN" to "69 TNNP" you would add the following to your channelmap file:
+
+TNN,57=TNNP,69
+
+
+
+
+________
+APPENDIX
+
+_____
+ICONS
+
+Not included within this package are icons to be used within the tvlistings of Personal ReplayGuide.    I have not included these since that would be a violation of copyright.
+
+By default, Personal ReplayGuide simply links to the images, but you may find better performance if you use them locally.
+
+
+The batch file "geticons.bat" does the following (you'll need WGET installed):
+
+wget http://my.replaytv.com/images/x_+00-.gif
+wget http://my.replaytv.com/images/x_-00+.gif
+wget http://my.replaytv.com/images/x_+00+.gif
+wget http://my.replaytv.com/images/x_-00-.gif
+wget http://my.replaytv.com/images/x_-oo-.gif
+wget http://my.replaytv.com/images/x_+oo-.gif
+wget http://my.replaytv.com/images/x_-oo+.gif
+wget http://my.replaytv.com/images/x_+oo+.gif
+wget http://my.replaytv.com/images/x_-0-.gif
+wget http://my.replaytv.com/images/x_-o-.gif
+wget http://my.replaytv.com/images/x_+0-.gif
+wget http://my.replaytv.com/images/x_-0+.gif
+wget http://my.replaytv.com/images/x_+0+.gif
+wget http://my.replaytv.com/images/x_+o-.gif
+wget http://my.replaytv.com/images/x_-o+.gif
+wget http://my.replaytv.com/images/x_+o+.gif
+
+You can create your own, download them manually or edit the replayguide.conf file to use the full url for each icon instead of trying to use them locally.     You are only entitled to use these icons if you are a registered MyReplayTV.com user.
+
+The legend of the symbols are: 
+	00		Guaranteed, Recurring
+	oo		Not Guaranteed, Recurring
+	0		Guaranteed
+	o		Not Guaranteed
+	+		Padding (if before the 0 or o it's before padding)
+	-		No Padding
+	
+Examples:
+	-00+		Guaranteed, Recurring, After Padding
+	+o+		Not Guaranteed with Padding Both Before and After
+
+
+
+If you elect to use local icons, you will need to edit replayguide.conf:
+
+image_bpgr=http://my.replaytv.com/images/x_+00-.gif
+...
+
+to
+
+image_bpgr=x_+00-.gif
+image_apgr=x_-00+.gif
+image_ppgr=x_+00+.gif
+image_gr=x_-00-.gif
+image_r=x_-oo-.gif
+image_bpr=x_+oo-.gif
+image_apr=x_-oo+.gif
+image_ppr=x_+oo+.gif
+image_gs=x_-0-.gif
+image_s=x_-o-.gif
+image_bpgs=x_+0-.gif
+image_apgs=x_-0+.gif
+image_ppgs=x_+0+.gif
+image_bps=x_+o-.gif
+image_aps=x_-o+.gif
+image_pps=x_+o+.gif
+
+
+You'll want to make sure that the 'imagedir' option points to the virtual directory where the images can be found.
+
+imagedir=/rtvimages
+
+
+
+Other icons are supported as well:
+
+image_stereo is the image to use for stereo programming.
+image_repeat is the image to use for repeats.
+image_cc is the image to use for closed captioning.
+image_tvg is the image to use for TV-G rated programs.
+image_tvpg is the image to use for TV-PG rated programs.
+image_tv14 is the image to use for TV-14 rated programs.
+image_tvma is the image to use for TV-MA rated programs.
+image_tvy is the image to use for TV-Y rated programs.
+image_tvy7 is the image to use for TV-Y7 rated programs.
+image_mpaag is the image to use for MPAA G rated programs.
+image_mpaapg is the image to use for MPAA PG rated programs.
+image_mpaapg13 is the image to use for MPAA PG13 rated programs.
+image_mpaar is the image to use for MPAA R rated programs.
+image_mpaanc17 is the image to use for MPAA NC17 rated programs.
+image_mpaanr is the image to use for movies that aren't rated.
+image_tl is the image to use for a theme that lost conflict rules.
+image_tw is the image to use for a theme that won conflict rules.
+
+
+
+You can also use icon images for most buttons, check the prg.conf.dist for more.
+
+
+
+
+_______________
+DATABASE SCHEMA
+
+This schema is provided for database administrators and to provide enough information so that you can manually create tables if need be (or using an "unsupported" DBMS).
+
+
+NOTE: Some databases use a "tinyint(1)" for bits.   Basically only a '0' or a '1' value is stored.
+NOTE: (uniqueid) just needs to be unique id of some kind.  This can be an int(10), a rowguid... it will vary between databases.
+
+
+table: replayunits
+
+replayid	int		ID Number
+replayname	char 16		Replay Name
+replayaddress	char 65		fqdn or IP
+replayport	int		TCP port number 
+defaultquality	int		default quality (0 high to 2 standard)
+defaultkeep	int		default number of eps to keep
+lastsnapshot	int		last time a guide snapshot request was made
+guideversion	int		version of the guidesnapshot
+replayosversion	int		version of the ReplayTV OS
+categories	char 255	delimited list of the ReplayTV categories
+
+Key field is "replayid" which in turn just needs to be an auto_incrementing identity field.
+
+NOTE: If you aren't using ReplayTV integration, this table isn't used (but must exist).
+
+
+
+table: tvlistings
+
+programid	(uniqueid)	unique number for fast lookups
+tmsprogramid	char 12		TMS program ID
+tmsid		int		TMS channel ID
+starttime	datetime	start time of the program
+endtime		datetime	end time of the program
+tuning		int		channel #
+channel		char 16		call letters
+title		char 255	program title	
+subtitle	char 255	episode title
+description	text		description text
+category	char 255	categories (comma delimited if more than one)
+captions	char 32		closed captioning system 'teletext' etc
+advisories	char 255	program advisories (usually delimited)
+episodenum	char 16		episode x of y
+vchiprating	char 16		TV-?? rating
+mpaarating	char 16		MPAA rating
+starrating	char 16		eg. 2.5/4 stars
+movieyear	char 16		movie release year
+repeat		bit		1 = yes
+stereo		bit		1 = yes
+movie 		bit		1 = yes
+subtitled 	bit		1 = yes
+
+Key field is "programid" which needs to be a unique identifier for each record.
+
+NOTE: tmsprogramid, tmsid and advisories are only used by DataDirect.
+
+
+table: channels
+
+channelid	(uniqueid)	channelid
+tmsid 		int 		TMS channel ID
+tuning		int 		channel #
+displaynumber	int		channel display number (no multiplier)
+channel		char 16		call letters
+display		char 64		display name
+iconsrc		char 255	url to the icon
+affiliate	char 32		affiliation description
+headend		char 16		ReplayTV headend code	
+hidden		bit 		is hidden
+postalcode	char 16		Postal Code of the Lineup
+systemtype	char 16		System Time of the Lineup (Antenna, DBS or Cable)
+lineupname	char 32		Name of the Lineup
+lineupdevice	char 32		Device of Lineup (e.g. Digital, Digital Rebuild)
+
+Key field is "channelid" which needs to be a unique identifier for each record.
+
+NOTE: tmsid is only used by DataDirect.  postalcode isn't currently used.  headend isn't currently used.   iconsrc is only used by XMLTV or if you setup and use getchannelicons.pl.  displaynumber, systemtype, and lineupname are only used by the manual recording code at this time.
+
+
+
+
+table: schedule
+
+scheduleid	int		record number
+programid 	(uniqueid)	links to the listings table
+replayid	int		links to the replayunits table
+firstrun	bit		flag for first run only recordings
+guaranteed	bit		flag for guaranteed
+theme		bit		flag for theme data
+recurring	bit		flag for repeat scheduling
+manual		bit		flag for manual recording
+conflict	bit		flag for a show that's in conflict
+created		int		epoch second value of when the item was scheduled
+padbefore	int		number of minutes padded before show's scheduled start
+padafter	int		number of minutes padded after show's scheduled end
+
+Key field is "scheduleid" which needs to be a unique identifier for each record.
+
+NOTE: At present "schedule" is only used by the replaySchedule SRM.
+
+
+table: castcrew
+
+castcrewid	(uniqueid)	castcrewid
+tmsprogramid 	char 12		TMS program ID
+role		int 		role category
+surname 	char 64		last name
+givenname 	char 64		first name
+
+Key field is "castcrewid" which in turn just needs to be an auto_incrementing identity field.
+
+NOTE: This table is not yet used and is even subject to change.
+
+
+
+
+_______________________
+DEVELOPMENT ENVIRONMENT
+
+This describes the environment where Personal ReplayGuide was developed.  
+
+Windows 2000 
+IIS 5.0
+ActivePerl 5.6.1 Build 635
+Microsoft SQL Server 2000
+MySQL 3.22
+
+WindowsXP Professional
+IIS 5.1
+ActivePerl 5.6.1 Build 635
+Microsoft SQL Server 2000 via System DSN to separate machine
+
+
+____________________
+THANKS AND GREETINGS
+
+I'd like to extend both thanks and greetings to the following people: Philip Van Baren, Kanji T. Bates, Kevin J. Moye, J.M., Rick Quartarone, Todd Larason, Matthew Linehan, Gerry Duprey, and all of the Personal ReplayGuide Users and Tesrers!
+

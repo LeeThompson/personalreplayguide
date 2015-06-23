@@ -1,0 +1,9 @@
+While we're happy to help if you should run into a bug or even have a feature request or two we cannot help you install and configure the software beyond the installation document (see INSTALL.txt)
+
+For additional assistance you might try the appropriate forums at http://www.avsforum.com or http://www.planetreplay.com
+
+Please do not email the authors with support questions regarding Personal ReplayGuide (bug reports and feature requests are ok, however).
+
+You may also use the tech support/bug tracking on sourceforge but you may experience faster results on AVSForum.
+
+

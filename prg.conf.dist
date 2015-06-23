@@ -1,0 +1,1132 @@
+#**********************************************************************
+# Personal ReplayGuide Configuration File
+# Global Configuration File
+#**********************************************************************
+# You will need to edit this file before you can start using
+# Personal ReplayGuide.
+#
+# Individual conf files aren't required from build 191 and higher but
+# can still be used if this file is missing or if the module's section
+# is missing.  (A section is denoted with [module].)
+#
+#***********************************************************************
+# SEE rg_info.pl for defining favorite channel groups and listing maps!
+#***********************************************************************
+# COMMENTS
+#
+# If a # // or ; appears in the first position on a line the entire 
+# line is a comment.
+#
+# Inline Comments are now available also with a # // or ; there is a 
+# limitation that double comment characters aren't seen as comments.
+# There has to be at least one non-whitespace character between them.
+#
+# Works:				RIGHT
+# myoption=myvalue			# this is my value
+# eg. "myvalue"
+#
+# Doesn't Work:				WRONG
+# myoption=myvalue                      ## this is my value
+# eg. "myvalue                          # this is my value"
+#
+#----------------------------------------------------------------------
+# SECURITY NOTE:
+#
+# If open to the public reading this .conf file via the web server 
+# should be disabled/prevented by setting permissions on the file or
+# blocking the .conf file type.  
+#
+# Consult your web server's documentation for specifics.
+#
+#----------------------------------------------------------------------
+
+#**********************************************************************
+# GLOBAL OPTIONS
+#**********************************************************************
+# Global Options take priority over local ones.   If you'd rather it be
+# the other way, edit rg_config.pl
+#----------------------------------------------------------------------
+
+[global]
+
+#----------------------------------------------------------------------
+# Debugging
+#----------------------------------------------------------------------
+# This flag controls debug messages.  Generally you'll want this set
+# to 0 unless you're troubleshooting or programming.
+
+debug=0
+
+#----------------------------------------------------------------------
+# Data Feeds
+#----------------------------------------------------------------------
+# This controls various functions concerning the data feed of your tv
+# listings in relation to Personal ReplayGuide.
+#
+# Valid Feeds are "xmltv" and "datadirect".  Consult the data feed 
+# documentation for more information.
+#
+# xmlfile is the XML file used by the Data Feed.   Generally you can
+# leave this set as is.
+
+datafeed=xmltv
+xmlfile=./na.xml
+
+#----------------------------------------------------------------------
+# Schedule Resolver Modules (SRMs)
+#----------------------------------------------------------------------
+# By default, Personal ReplayGuide uses a simple module called 
+# rg_guide.pl - this module is slow and does not offer advanced
+# features such as TO DO lists, Schedule Bar or full conflict
+# resolution for scheduling status.
+#
+# If you are using Personal ReplayGuide with one or more ReplayTVs,
+# we highly recommend that you download replaySchedule and select
+# rg_scheduler.pl as your schedule resolver module for best results.
+#
+# rg_null       Disables all SRM functions.  If you do not have any
+#		RTV units defined (run configure.pl to define them)
+#		this will run automatically regardless of setting.
+#
+# rg_guide	Simple, slow and limited schedule resolver module.
+#
+# rg_scheduler	Advanced schedule resolver module which uses the
+#		binary replaySchedule for processing.   
+#		http://replayguide.sourceforge.net/replaySchedule
+# 	
+# schedule2sql  Part of the rg_scheduler package.   Defaults to
+#	        "schedule2sql.pl" so unless you've renamed it
+#		you can leave the schedule2sql= line commented out.
+
+scheduler=rg_guide.pl
+# scheduler=rg_scheduler.pl
+# schedule2sql=schedule2sql.pl
+
+#----------------------------------------------------------------------
+# Logging
+#----------------------------------------------------------------------
+# If missing or empty, logging is disabled.  Otherwise logging will be
+# done to the path/filename given.  eg. c:\logfiles\prg.log
+#
+# Obviously the process running the perl interpreter will need write 
+# permission.
+#
+# When initially testing Personal ReplayGuide it is recommended that
+# you enable logging.
+#
+# NOTE: Setting logfile under global will enable logging for ALL 
+# modules.  
+# 
+# logfile=
+#
+# NOTE: You can have the logging routine add the module as a prefix 
+# (eg: replayguide::log message instead of just log message).
+#
+# To enable add logmodulename=1
+
+logfile=prg.log
+
+#----------------------------------------------------------------------
+# Access List
+#----------------------------------------------------------------------
+# Access list controls what connecting IP addresses can see what you
+# have scheduled or schedule new shows.
+#
+# The format is comma delimited IP addresses.  
+# Wildcards and ranges are not permitted.
+#
+# To shut off permissions:
+#	 Everyone: ALL
+#   	   No One: NONE
+#
+# Setting allow=NONE will *disable* all ReplayTV integration.
+#
+# Setting allow=ALL will allow everyone who can access your server to
+# see what you have scheduled and make new schedule requests.
+# NOTE: They will NOT be allowed to watch or delete shows.
+#
+
+allow=ALL
+
+# Examples:
+#  allow=192.168.0.3,192.168.0.4
+
+#----------------------------------------------------------------------
+# PDA List
+#----------------------------------------------------------------------
+# PDA list controls what connecting IP addresses are using PDA 
+# devices (dimensions of 240x320 or so). 
+#
+# The format is comma delimited IP addresses.  
+# Wildcards and ranges are not permitted.
+#
+#	 Everyone: ALL
+#   	   No One: NONE
+#
+# Setting allow=NONE will shut off the PDA List by IP.
+#
+# Generally if you're going to do ALL or NONE you should just use
+# showpdaformat.
+#
+# Setting allow=ALL will allow force everyone who can access your server
+# to PDA format.
+#
+
+pda=NONE
+
+# Examples:
+#  pda=192.168.0.3,192.168.0.4
+
+
+
+#----------------------------------------------------------------------
+# Web Server Virtual Directory Locations
+#----------------------------------------------------------------------
+#
+# wwwdir is the root of your web pages.  Usually /
+#
+# scriptdir is the location of your perl scripts.
+#
+# imagedir is where local images for Personal ReplayGuide are located.
+#
+# scriptname is the full name of the script.  If your web server uses
+# a different extension for perl scripts, change it here.
+#
+# schedulename is the full name of the ReplayTV Recording Scheduler
+# script.  If your web server uses a different extension for perl
+# scripts, change it here.
+#
+# usingapache should be set to 1 if your web server does NOT require
+# "HTTP/1.0 200 OK" to be sent (like Apache).   
+# NOTE: If you are using mod_perl this will be detected automatically.
+
+wwwdir=/
+scriptdir=/cgi
+imagedir=/cgi/images
+scriptname=replayguide.pl
+schedulename=schedule.pl
+usingapache=0
+
+#----------------------------------------------------------------------
+# Fonts and Colors
+#----------------------------------------------------------------------
+#
+# headingbackgroundcolor is the background color of the header row.
+#
+# headingtextcolor is the foreground color of the header row.
+#
+# backgroundcolor is the general background color.
+#
+# textcolor is the general text color.
+#
+# visitedlinkcolor is the color of links that have been clicked on.
+#
+# activelinkcolor is the color of the link currently highlighted.
+#
+# linkcolor is the color of links that have not been visited or
+# highlighted.
+#
+# titlefont is the name of the font to use for titles.
+#
+# menufont is the name of the font for the menu section.
+#
+
+image_logo=replaytvlogo.jpg
+
+#**********************************************************************
+# End of Global Settings
+#**********************************************************************
+
+
+#**********************************************************************
+# DATABASE SETTINGS
+#**********************************************************************
+# These options configure Personal ReplayGuide to interact with your
+# database.
+#----------------------------------------------------------------------
+
+[database]
+
+#----------------------------------------------------------------------
+# Database Settings
+#----------------------------------------------------------------------
+#
+# The default database now included in Personal ReplayGuide is 
+# SQLite which is a free database system available for most platforms.
+#
+# If you wish to use SQLite support, you don't need to make any changes
+# to this section.
+#
+#----------------------------------------------------------------------
+# driver is which DBD driver to use.  Supported are: ODBC, mysql and
+# SQLite.   ODBC covers a wide range but most of the testing has 
+# been done with Microsoft SQL Server 2000 Developer's Edition. 
+# Chances are Microsoft Access won't work with modification since it's
+# SQL syntax is a little different.
+#
+# username is the SQL userid to use.  It needs read, write, delete and
+# update permissions.  Not used with SQLite.
+# 
+# password is the SQL password to use with the userid.
+# Not used with SQLite.
+# 
+# host is the machine that SQL is on (if the SQL server you are using
+# supports network).  If it's on the same machine, leave it at the
+# default of localhost.    NOTE: ODBC users should leave it as 
+# localhost even if the System DSN is talking to a remote machine.
+#
+# database is the name of the database, DSN, instance or filename
+# to talk to (the type depends on which database you are using.)
+# 
+# table_replayunits, table_channels, table_tvlistings, table_schedule
+# and table_castcrew allow the use of different table names than the
+# default.  These should be left alone unless you know what you are
+# doing.  
+# (NOTE: sqlconfig is aware of these settings so if you  change them
+# and only use sqlconfig you will be fine.)
+#
+# dsn is the ODBC connection name *IF* different from the database name.
+# Having these separate will cause a slight performance hit since the
+# core SQL routine will do "USE database;" for you.   It is also a
+# better idea to have the ODBC DSN switch to the database for you
+# from a security standpoint.
+#
+
+driver=SQLite
+username=
+password=
+host=localhost
+database=tvlistings
+
+# table_replayunits=replayunits
+# table_channels=channels
+# table_tvlistings=tvlistings
+# table_schedule=schedule
+# table_castcrew=castcrew
+
+#**********************************************************************
+# DataDirect DataFeed 
+#**********************************************************************
+# See DATADIRECT.txt for information on setting up an account.  it is
+# free for all Personal ReplayGuide users.
+#----------------------------------------------------------------------
+
+[datadirect]
+
+#----------------------------------------------------------------------
+# DataDirect Client
+#----------------------------------------------------------------------
+# 
+# username is the DataDirect username.
+#
+# password is the password for the DataDirect account.
+#
+# days is the number of days of listings to download.  Maximum is 14.
+# (Roughly DataDirect takes about 10 seconds per day of listings)
+#
+# verbose controls if the client runs silently or not.   It's 
+# recommended that this be set to 1 until you're sure it's working.
+#
+# webservice is the URL for the WSDL for the SOAP client to download
+# from.   This shouldn't need to be changed from the automatic
+# default.
+#
+# debug controls debug information (note, this doesn't log to a
+# logfile but outputs to STDOUT).
+#
+# xmlfile is the file to store the data in.   Generally you should
+# define this in the global section.
+#
+# allow is a comma limited list of IP addresses allowed to run 
+# the script in CGI mode.    This isn't yet available.
+#
+# client is the client for the datafeed.  
+# This should be a fully qualified pathname if required.
+# (Used by updatetvdata)
+#
+# converter is the SQL converter for the datafeed.   
+# This should be a fully qualified pathname if required.
+# (Used by updatetvdata)
+#
+# parameters are the command line parameters, if any, for the datafeed
+# client.
+# (Used by updatetvdata)
+#
+# redirectoutput is a flag for the datafeed client if it just outputs
+# to STDOUT.   Can be a 1 (yes) or 0 (no).   Default is off.
+# (Used by updatetvdata)
+#
+# successcode is the value that the client returns to indicate a
+# successful download.  The default if not specified is 1. 
+# (Used by updatetvdata)
+#
+# geticons enables the automatic running of getchannelicons after
+# a successful refresh.  (Used by updatetvdata)  (see [geticons])
+#
+# geticonscript is the fully qualified (if needed) pathname to
+# the script or program to download icons. (Used by updatetvdata)
+# if missing this defaults to ./getchannelicons.pl
+#
+# showfirstaireddate determines if the premiere/first air date of the
+# show or episode should be added to the description.
+#
+# showepisodenumber determines if the syndicator's episode number for
+# the individual episode should be added to the description (please
+# note that this is usually a production number and the format differs
+# between shows and syndicators.)
+#
+
+
+username=
+password=
+days=12
+verbose=1
+client=.\datadirect_client.pl
+converter=.\datadirect2sql.pl
+successcode=1
+geticons=0
+showfirstaireddate=1
+showepisodenumber=1
+
+#----------------------------------------------------------------------
+# Logging
+#----------------------------------------------------------------------
+# If missing or empty, logging is disabled.  Otherwise logging will be
+# done to the path/filename given.  eg. c:\logfiles\prg.log
+#
+# Obviously the process running the perl interpreter will need write 
+# permission.
+#
+# When initially testing Personal ReplayGuide it is recommended that
+# you enable logging.
+#
+# NOTE: Setting logfile under global will enable logging for ALL 
+# modules.  
+# 
+# logfile=
+#
+# NOTE: You can have the logging routine add the module as a prefix 
+# (eg: replayguide::log message instead of just log message).
+#
+# To enable add logmodulename=1
+
+#----------------------------------------------------------------------
+# DataDirect to SQL Converter
+#----------------------------------------------------------------------
+
+[datadirect2sql]
+
+#----------------------------------------------------------------------
+# DataDirect Support
+#----------------------------------------------------------------------
+# Debugging
+#----------------------------------------------------------------------
+# debug controls debug messages.  Generally you'll want this set 
+# to 0 unless you're troubleshooting or programming.
+#
+# other options are:
+# 	do_not_insert		create a CSV instead of inserting to DB
+#	do_not_delete_rows	do not drop tvlistings table rows first
+#
+# maxrows is the maximum number of rows to INSERT into TVLISTINGS 
+# (0 is unlimited)
+#
+# dotinterval is the number of rows before a '.' is shown for progress
+# (default 500)
+#
+# multiplier is the increment between lineups.  (default is 1000)
+#
+# xmlfile is the file to read from.  Must match the datadirect client's
+# setting.
+#
+# allow is a comma limited list of IP addresses allowed to run 
+# the script in CGI mode.    This isn't yet available.
+#
+# logfile specifies the pathname for the log file.  
+#
+# use_castcrew controls if cast/crew data will be imported into the
+# database.   This isn't implemented yet.
+#
+#----------------------------------------------------------------------
+# Advanced Options
+#----------------------------------------------------------------------
+# titlemap refers to the config file to use for title mapping 
+#
+# channelmap refers to the config file to use for channel mapping
+#
+# eg. titlemap=titlemap.conf
+#
+#
+# CHANNEL MAP FORMAT
+#	OLD_CHANNELID,OLD_TUNING=NEW_CHANNELID,NEW_TUNING
+#
+# For example to remap TNN channel 57 to TNNP channel 69:
+#	TNN,57=TNNP,69
+#
+#
+# TITLE MAP FORMAT
+#	OLD_TITLE=NEW_TITLE
+#
+# For example:
+#	Lois &amp; Clark: The New Adventures of Superman=Lois &amp; Clark: New Adventures of Superman
+#
+#
+# Both mapping files support comments in the exact same format as this file.
+#
+
+#**********************************************************************
+# End of DataDirect Settings
+#**********************************************************************
+
+
+#**********************************************************************
+# RG_Scheduler  / replaySchedule - Schedule2SQL Settings
+#**********************************************************************
+
+[schedule2sql]
+
+#----------------------------------------------------------------------
+# replaySchedule (rg_scheduler) Settings
+#----------------------------------------------------------------------
+# Debugging
+#----------------------------------------------------------------------
+# debug controls debug messages.  Generally you'll want this set 
+# to 0 unless you're troubleshooting or programming.
+#
+# other options are:
+# 	do_not_insert		create a CSV instead of inserting to DB
+#	do_not_delete_rows	do not drop tvlistings table rows first
+#
+# maxrows is the maximum number of rows to INSERT into TVLISTINGS 
+# (0 is unlimited)
+#
+# multiplier is the increment between lineups.  (default is 1000)
+#
+# xmlfile is the file to read from.  
+#
+# replayschedule is a pathname to the replaySchedule binary.   You
+# may need to set permissions on your web server to allow this to
+# execute from a web-context.    The data feed SQL converter will
+# also invoke this when it is complete each time it is run.
+#
+# allow is a comma limited list of IP addresses allowed to run 
+# the script in CGI mode.    This isn't yet available.
+#
+# logfile specifies the pathname for the log file.  
+#
+# datafeed specifies the format of the XML file.   Valid options
+# are "xmltv" and "datadirect".
+#
+
+replayschedule=./replaySchedule.exe
+
+#**********************************************************************
+# End of replayschedule/schedule2sql settings
+#**********************************************************************
+
+
+#**********************************************************************
+# XMLTV DataFeed
+#**********************************************************************
+
+[xmltv]
+
+#----------------------------------------------------------------------
+# XMLTV Support
+#----------------------------------------------------------------------
+# client is the client for the datafeed.  
+# This should be a fully qualified pathname if required.
+# eg. D:\XMLTV\xmltv.exe or /usr/bin/xmltv/xmltv
+# (Used by updatetvdata)
+#
+# converter is the SQL converter for the datafeed.   
+# This should be a fully qualified pathname if required.
+# Usually this should be xmltv2sql.pl. 
+# (Used by updatetvdata)
+#
+# parameters are the command line parameters, if any, for the datafeed
+# client.  For XMLTV specify the grabber and number of days here.
+# (Roughly XMLTV takes 15 minutes per day of listings to grab.)
+# (Used by updatetvdata)
+#
+# redirectoutput is a flag for the datafeed client if it just outputs
+# to STDOUT.   Can be a 1 (yes) or 0 (no).
+# (Used by updatetvdata)
+#
+# successcode is the value that the client returns to indicate a
+# successful download.  The default if not specified is 1.   For XMLTV
+# this should be 0.
+# (Used by updatetvdata)
+#
+# geticons enables the automatic running of getchannelicons after
+# a successful refresh.  (Used by updatetvdata)  (see [geticons])
+#
+# geticonscript is the fully qualified (if needed) pathname to
+# the script or program to download icons. (Used by updatetvdata)
+# if missing this defaults to ./getchannelicons.pl
+#
+#----------------------------------------------------------------------
+# NOTE: XMLTV's own DataDirect support introduced in XMLTV 0.5.31 is
+#	not supported by Personal ReplayGuide, please use PRG's native
+#	DD support instead. 
+#
+#	You can use your XMLTV DataDirect login information if you wish.
+#----------------------------------------------------------------------
+
+client=c:\xmltv\xmltv.exe
+converter=.\xmltv2sql.pl
+parameters=tv_grab_na --days 12		
+redirectoutput=1
+successcode=0
+geticons=0
+
+#----------------------------------------------------------------------
+# XMLTV to SQL Converter
+#----------------------------------------------------------------------
+
+[xmltv2sql]
+
+#----------------------------------------------------------------------
+# XMLTV Support
+#----------------------------------------------------------------------
+# Debugging
+#----------------------------------------------------------------------
+# debug controls debug messages.  Generally you'll want this set 
+# to 0 unless you're troubleshooting or programming.
+#
+# other options are:
+# 	do_not_insert		create a CSV instead of inserting to DB
+#	do_not_delete_rows	do not drop tvlistings table rows first
+#
+#----------------------------------------------------------------------
+# Other Options
+#----------------------------------------------------------------------
+# maxrows is the maximum number of rows to INSERT into TVLISTINGS 
+# (0 is unlimited)
+#
+# dotinterval is the number of rows before a '.' is shown for progress
+# (default 500)
+#
+# multiplier is the increment between lineups.  (default is 1000)
+#
+# xmlfile is the file to read from. 
+#
+# allow is a comma limited list of IP addresses allowed to run 
+# the script in CGI mode.    This isn't yet available.
+#
+# logfile specifies the pathname for the log file.  
+#
+# postalcode is the zip/postal code for the lineup.  this isn't really
+# used yet.
+#
+# lineupname is the name of the lineup.  eg. "DIRECTV" or "Comcast".
+# this is displayed when setting up a manual recording.
+#
+# systemtype is the type of lineup used for manual recordings.
+# valid systemtypes are: Antenna, Cable, DBS
+# 
+#----------------------------------------------------------------------
+# Advanced Options
+#----------------------------------------------------------------------
+# titlemap refers to the config file to use for title mapping 
+#
+# channelmap refers to the config file to use for channel mapping
+#
+# eg. titlemap=titlemap.conf
+#
+#
+# CHANNEL MAP FORMAT
+#	OLD_CHANNELID,OLD_TUNING=NEW_CHANNELID,NEW_TUNING
+#
+# For example to remap TNN channel 57 to TNNP channel 69:
+#	TNN,57=TNNP,69
+#
+#
+# TITLE MAP FORMAT
+#	OLD_TITLE=NEW_TITLE
+#
+# For example:
+#	Lois &amp; Clark: The New Adventures of Superman=Lois &amp; Clark: New Adventures of Superman
+#
+#
+# Both mapping files support comments in the exact same format as this file.
+#
+
+#**********************************************************************
+# End of XMLTV DataFeed Settings
+#**********************************************************************
+
+
+#**********************************************************************
+# Get Channel Icons
+#**********************************************************************
+
+[geticons]
+
+#----------------------------------------------------------------------
+# Debugging
+#----------------------------------------------------------------------
+# This flag controls debug messages.  Generally you'll want this set
+# to 0 unless you're troubleshooting or programming.
+
+debug=0
+
+#----------------------------------------------------------------------
+# General Configuration
+#----------------------------------------------------------------------
+#
+# channelicondir is where local channel icon images will be stored.
+#  This must be a full/relative path to an existing directory with
+#  write access.  (OPTIONAL)
+#
+# verbose is a flag that controls whether information is displayed in
+#  the console.  The default (and recommended) value is 1.
+#
+#----------------------------------------------------------------------
+# Uncomment to enable storing channel icons locally
+#----------------------------------------------------------------------
+
+# channelicondir=./channelicons
+# verbose=0
+
+#----------------------------------------------------------------------
+# Data Direct Configuration
+#----------------------------------------------------------------------
+# The following options are only needed if Personal ReplayGuide is
+# using Data Direct to retrieve TV listings instead of XMLTV.  Data
+# Direct does not currently include channel icons, so we have to get
+# them from Zap2It.com separately.
+#
+# getchannelicons will try to automatically detect the providerid so
+# these fields are all optional.   the zip/postal code is provided by
+# the datadirect feed.
+#
+# providerid is the unique number associated with your cable/satellite
+#  provider on Zap2It.com.  You can get this number by browsing to
+#  http://www.zap2it.com, entering your zip code, selecting your
+#  provider, and clicking "Confirm Channel Lineup."  The URL of the
+#  page that appears will contain a "&system=XXXXX" parameter.  Use
+#  that number for the providerid value.     This is typically a 
+#  five digit number.
+#
+# zipcode is your zip/postal code.
+#
+#----------------------------------------------------------------------
+
+# providerid=0
+# zipcode=0
+
+#**********************************************************************
+# End of Get Channel Icons
+#**********************************************************************
+
+
+#**********************************************************************
+# REPLAYGUIDE OPTIONS
+#**********************************************************************
+
+[replayguide]
+
+# These options cover the behavior of the replayguide.pl file.
+#----------------------------------------------------------------------
+# Debugging
+#----------------------------------------------------------------------
+# This flag controls debug messages.  Generally you'll want this set
+# to 0 unless you're troubleshooting or programming.
+
+debug=0
+
+#----------------------------------------------------------------------
+# Logging
+#----------------------------------------------------------------------
+# If missing or empty, logging is disabled.  Otherwise logging will be
+# done to the path/filename given.  eg. c:\logfiles\prg.log
+#
+# Obviously the process running the perl interpreter will need write 
+# permission.
+#
+# When initially testing Personal ReplayGuide it is recommended that
+# you enable logging.
+#
+#
+# NOTE: You can have the logging routine add the module as a prefix 
+# (eg: replayguide::log message instead of just log message).
+#
+# To enable add logmodulename=1
+
+logfile=prg.log
+
+#----------------------------------------------------------------------
+# Personal ReplayGuide Options
+#----------------------------------------------------------------------
+#
+# NOTE: Some of these options depend on the capabilities of the selected
+# Schedule Resolver Module (SRM).
+#
+#
+# defaultslot is the number of minutes represented by each column.
+#
+# defaultshowhours sets the number of hours to display if not specified
+# by the hours setting in the toolbar.  The default if this value is
+# missing is 3.
+# 
+# newwindow is a flag that determines if a new window will be opened
+# if you click on a title or date/time.
+#
+# showchannelicons is a flag that determines if the channel icons should
+# be shown or not.
+#
+# showrtvicons is a flag that determines if ReplayTV recording status 
+# icons should be shown in listings and search results.
+#
+# showbuttonicons is a flag that determines if buttons will use bitmaps
+# instead of text (if defined)
+#
+# showheaderrows sets the frequency that the grid header is shown (the
+# horizontal time markers).  The default is 0 which will cause the
+# header to be shown only at the start and end of the grid.    A setting
+# of '15' would show the header after every 15th channel or so.
+#
+# searchfutureonly tells the search engine to only look for shows from
+# the current date/hour onwards.
+#
+# showschedulebar enables an extra row of schedule info for each unit
+# at the top of the tv listings table
+# (if == 1, show full program details)
+# (if == 2, show abbreviated program details)
+#
+# allowtitleedit enables an edit text field for show titles when 
+# scheduling a show.    If not enabled (default) the listings provided
+# title will be used.
+#
+# skipversioncheck causes Personal ReplayGuide to allow schedule attempts
+# regardless of what version it has determined that the remote ReplayTV
+# is running.   The default (and recommended) value is 0.
+#
+# gridendoverlap allows you to adjust how much overlap time you will
+# see (in grid mode) for shows that are ending after the grid starts.
+# The default if this value is missing is 15 minutes.
+# (eg. if a movie is ending at 9:05 but your grid starts at 9PM you
+# won't see that movie listed.    However, if the movie ends at 9:20
+# instead, you would see it as part of the 9 PM column.)
+#
+# channelicondir is where local channel icon images are located.
+#   (hint: use the getchannelicons.pl script to download the icons
+#    to a local directory)
+# 
+# todooption is for scheduler modules that have ToDo list functions.
+# 	0 (default) 	Display all events for the entire schedule
+#			range.
+#	1		Display all events from today.
+#	2		Display all events from right now (nearest
+#			hour.)
+#				        
+# todofromstart is for scheduler modules that have ToDo list 
+# functions.   If enabled then events that start during the window
+# will be shown, otherwise any overlapping events will be shown.
+# The default is off.
+#
+# primetimestart is the hour (24 hour clock) that is considered
+# prime time (for the Prime button).   Default is 20 (8PM).
+#
+# rtv_updatesleepseconds specifies the amount (in seconds) that
+# Personal ReplayGuide should pause after scheduling a show to
+# ensure that guide data is updated.    This has no effect if
+# guide refreshes are disabled.
+#
+# rtv_allowdelete controls if the DELETE button for ReplayShows
+# should be enabled.  Default is off.  
+# NOTE: NOT IMPLEMENTED YET.
+#
+# defaultmode controls the first screen you'll see when
+# running Personal ReplayGuide.     
+# Valid options are: NOW (default), SEARCH, TODO (if supported by 
+# the selected SRM).
+#
+# showrtvtext is a flag that determines if text should be displayed
+# in addition or in lieu of the icons.   The behavior depends on the
+# current setting of showrtvicons.
+#
+# If showrtvicons is on,  showrtvtext will show the unit next 
+# to the graphic.   This is useful if your web browser does not
+# use ALT tags as tooltips.  
+#
+# If showrtvicons is off, showrtvtext will show all the same 
+# information in a text format.
+#
+# NOTE: showrtvtext is forced to on with PDA devices.
+#
+# showrtvthemes enables theme support.
+#
+
+defaultslot=30
+newwindow=0
+showchannelicons=1
+showrtvicons=1
+showschedulebar=2
+showbuttonicons=0
+showheaderrows=0
+searchfutureonly=0
+allowtitleedit=0
+skipversioncheck=0
+gridendoverlap=15
+
+#----------------------------------------------------------------------
+# Default RTV Information
+#----------------------------------------------------------------------
+# defaultreplaytv is the friendly name of your most commonly used 
+# 		  ReplayTV
+#
+
+defaultreplaytv=Living Room
+
+
+#----------------------------------------------------------------------
+# ReplayTV Parameters
+#----------------------------------------------------------------------
+# refreshinterval is how many minutes between guide refreshes.
+# (whenever you schedule a show a refresh is triggered automatically)
+# (software default varies between scheduler modules).   
+# NOTE: Some scheduler modules will ignore this value, this will be
+# noted in the log file.
+#
+# snapshotpath is a relative path where Personal ReplayGuide stores 
+# guide snapshots.   Default is the same directory  as the perl script.
+# The process running the perl interpreter will need read and write 
+# permission.   
+#
+# NOTE: This directory *MUST* exist.
+# NOTE: You can always select "Manual Refresh" with the Replay tool.
+
+refreshinterval=15
+snapshotpath=./
+
+#----------------------------------------------------------------------
+# Personal ReplayGuide Colors/Fonts
+#----------------------------------------------------------------------
+#
+# You can customize the look and feel of Personal ReplayGuide
+#
+#
+# All of these use standard HTML color codes 
+# (eg. #RRGGBB or #A0F000 etc)
+#
+# futureshowcolor is for shows that have not started yet.   
+# Default is white.
+#
+# currentshowcolor is for shows that have started and are in progress.
+# Default is light gray.
+#
+# pastshowcolor is for shows that have ended before the current time.
+# Default is dark gray.
+#
+# futurescheduledcolor is for shows that will record in the future.
+# Default is light green.
+#
+# currentscheduledcolor is for shows that have started and are recording.
+# Default is medium green.
+#
+# pastscheduledcolor is for shows that have recorded in the past.
+# Default is darker green.
+#
+# futureconflictcolor is for shows that will not record due to conflict.
+# Default is light red.
+#
+# currentconflictcolor is for shows that have started and didn't record due to conflict.
+# Default is medium red.
+#
+# pastconflictcolor is for shows that have didn't record due to conflict in the past.
+# Default is darker red.
+#
+# futurethemecolor is for themes that will record.
+# Default is light blue.
+#
+# currentthemecolor is for themes that are recording.
+# Default is medium blue.
+#
+# pastthemecolor is for themes that have recorded in the past.
+# Default is darker blue.
+#
+# futurethemeconflictcolor is for themes that will not record due to conflict.
+# Default is light red.
+#
+# currentthemeconflictcolor is for themes that have started and didn't record due to conflict.
+# Default is medium red.
+#
+# pastthemeconflictcolor is for themes that have didn't record due to conflict in the past.
+# Default is darker red.
+#
+# channelbackgroundcolor is the background color of the channel column.
+#
+# channeltextcolor is the foreground color of the channel column.
+#
+# listingsfont is the name of the font to use for television listings. 
+# For example: listingsfont=Arial Narrow
+#
+# detailfont is the name of the font to use on the program details/schedule show screens.
+#
+# channelfont is the name of the font to use in the channel column.
+#
+# headingfont is the name of the font to use for the header row.
+#
+# nowicon is the name of the bitmap to use for the now button.
+#
+# goicon is the name of the bitmap to use for the go button.
+#
+# allicon is the name of the bitmap to use for the all (channels) button.
+#
+# prevwindowicon is the name of the bitmap to use for the <<< button.
+#
+# nextwindowicon is the name of the bitmap to use for the >>> button.
+#
+# prevchanicon is the name of the bitmap to use for the < button.
+#
+# nextchanicon is the name of the bitmap to use for the > button.
+#
+# findicon is the name of the bitmap to use for the find button.
+#
+# selecticon is the name of the bitmap to use for the select button.
+#
+# scheduleicon is the name of the bitmap to use for the schedule button.
+#  
+# doneicon is the name of the bitmap to use for the done button.
+#
+# primeicon is the name of the bitmap to use for the prime button.
+#
+# confirmicon is the name of the bitmap to use for the confirm button.
+#
+# locateicon is the name of the bitmap to use for the locate button.
+#
+# findallicon is the name of the bitmap to use for the find all button.
+# 
+# headingbackgroundcolor is the background color of the header row.
+#
+# headingtextcolor is the foreground color of the header row.
+#
+# backgroundcolor is the general background color.
+#
+# textcolor is the general text color.
+#
+# visitedlinkcolor is the color of links that have been clicked on.
+#
+# activelinkcolor is the color of the link currently highlighted.
+#
+# linkcolor is the color of links that have not been visited or
+# highlighted.
+#
+# titlefont is the name of the font to use for titles.
+#
+# menufont is the name of the font for the menu section.
+#
+
+#----------------------------------------------------------------------
+# Images for Listings Icons
+#----------------------------------------------------------------------
+# These are the definitions for the icons used for ReplayTV recording
+# status.
+#
+# To use the following links, you'll need to be a registered user of
+# MyReplayTV.
+#
+# The images can be local or remote (http://).
+#
+# Legend:
+# 	b - before
+# 	a - after
+# 	p - padding
+# 	pp- before & after padding
+# 	g - guaranteed
+# 	r - recurring
+# 	s - single
+
+image_logo=logo_ndrake.jpg
+image_bpgr=http://my.replaytv.com/images/x_+00-.gif
+image_apgr=http://my.replaytv.com/images/x_-00+.gif
+image_ppgr=http://my.replaytv.com/images/x_+00+.gif
+image_gr=http://my.replaytv.com/images/x_-00-.gif
+image_r=http://my.replaytv.com/images/x_-oo-.gif
+image_bpr=http://my.replaytv.com/images/x_+oo-.gif
+image_apr=http://my.replaytv.com/images/x_-oo+.gif
+image_ppr=http://my.replaytv.com/images/x_+oo+.gif
+image_gs=http://my.replaytv.com/images/x_-0-.gif
+image_s=http://my.replaytv.com/images/x_-o-.gif
+image_bpgs=http://my.replaytv.com/images/x_+0-.gif
+image_apgs=http://my.replaytv.com/images/x_-0+.gif
+image_ppgs=http://my.replaytv.com/images/x_+0+.gif
+image_bps=http://my.replaytv.com/images/x_+o-.gif
+image_aps=http://my.replaytv.com/images/x_-o+.gif
+image_pps=http://my.replaytv.com/images/x_+o+.gif
+
+#
+# Conflict loser versions of the above
+#
+
+image_cbpgr=http://my.replaytv.com/images/x_+00-.gif
+image_capgr=http://my.replaytv.com/images/x_-00+.gif
+image_cppgr=http://my.replaytv.com/images/x_+00+.gif
+image_cgr=http://my.replaytv.com/images/x_-00-.gif
+image_cr=http://my.replaytv.com/images/x_-oo-.gif
+image_cbpr=http://my.replaytv.com/images/x_+oo-.gif
+image_capr=http://my.replaytv.com/images/x_-oo+.gif
+image_cppr=http://my.replaytv.com/images/x_+oo+.gif
+image_cgs=http://my.replaytv.com/images/x_-0-.gif
+image_cs=http://my.replaytv.com/images/x_-o-.gif
+image_cbpgs=http://my.replaytv.com/images/x_+0-.gif
+image_capgs=http://my.replaytv.com/images/x_-0+.gif
+image_cppgs=http://my.replaytv.com/images/x_+0+.gif
+image_cbps=http://my.replaytv.com/images/x_+o-.gif
+image_caps=http://my.replaytv.com/images/x_-o+.gif
+image_cpps=http://my.replaytv.com/images/x_+o+.gif
+
+#----------------------------------------------------------------------
+# Other Icons for Channels and Details
+#
+# These should be around 9x9 or 10x10 depending on your font sizes.
+#----------------------------------------------------------------------
+# image_stereo is the image to use for stereo programming.
+#
+# image_repeat is the image to use for repeats.
+#
+# image_cc is the image to use for closed captioning.
+#
+# image_tvg is the image to use for TV-G rated programs.
+#
+# image_tvpg is the image to use for TV-PG rated programs.
+#
+# image_tv14 is the image to use for TV-14 rated programs.
+#
+# image_tvma is the image to use for TV-MA rated programs.
+#
+# image_tvy is the image to use for TV-Y rated programs.
+#
+# image_tvy7 is the image to use for TV-Y7 rated programs.
+#
+# image_mpaag is the image to use for MPAA G rated programs.
+#
+# image_mpaapg is the image to use for MPAA PG rated programs.
+#
+# image_mpaapg13 is the image to use for MPAA PG13 rated programs.
+#
+# image_mpaar is the image to use for MPAA R rated programs.
+#
+# image_mpaanc17 is the image to use for MPAA NC17 rated programs.
+#
+# image_mpaanr is the image to use for movies that aren't rated.
+#
+# image_tl is the image to use for a non-guaranteed theme that lost conflict rules.
+#
+# image_tw is the image to use for a non-guaranteed theme that won conflict rules.
+#
+# image_gt is the image to use for a guaranteed theme.
+#
+# image_cgt is the image to use for a guaranteed theme that lost conflict rules.
+#
+
+#**********************************************************************
+# End of ReplayGuide Settings
+#**********************************************************************
+
+#**********************************************************************
+# END OF FILE
+#**********************************************************************
+

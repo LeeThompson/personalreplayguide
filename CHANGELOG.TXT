@@ -1,0 +1,170 @@
+Build 200. Beta Release.
+	   Fixed an issue that was causing blank "referer" errors in Apache 2's error.log.
+	   Added two new flags in the prg.conf under [datadirect2sql] for controlling if the new data appears or not.   The default for both is true/enabled.   (syndicate/production episode number and original airdate/first aired date are the data fields.)
+	   Fixed an issue where the script would change to the user's home directory.  This is fixed.
+	   Fixed a bug I introduced during a code cleanup of datadirect_client and broke it so it only gave you a few days.  Fixed now.  *Blush*.	   
+	   Fixed a problem where the Replay guidesnapshot was not updating after scheduling a show even if the option was enabled.
+	   Added support for several new DataDirect fields (they will appear in the PRG description), syndicated ep # and original airdate.   This new data should begin appearing on or about April 12th 2004.
+	   Improved the providerid detection.
+	   Fixed a problem with handling the lineup and lineupdevice fields.   
+
+Build 199. Beta Release.	   
+	   Added support for PRG_CONFPATH environment variable if you want your .conf in a different location.
+	   Added DSN to [database] section for cases where the ODBC DSN may not be the same as the database name.  (This isn't recommended, however.)
+           sqlconfig will now create databases.   This isn't recommended for ODBC (best practice is to have the ODBC DSN automatically switch to the database which means it has to already exist.)
+           Fixed some errors in the SQL script parser.
+	   Fixed some .sql scripts.
+           Removed CGI::ReadParse in favor of something more modern.  Removed CGI module from most scripts since they didn't need it.	
+	   Scheduling shows on ReplayTVs that don't use the standard port number should work now.
+	   Attempted a fix for Unicode UTF-8 error under Perl 5.8
+	   Fixed an issue with the tvgrid rendering where it would mistakenly group shows in a slot when it shouldn't.
+	   Fixed an issue with the tvgrid rendering where it would still attempt to print an extra column.
+	   Improved directory change code, should be much more reliable.
+	   Improved Apache environment detection both with and without mod_perl.
+	   Found and fixed a bug that would cause some blank lines to be sent to the console even if verbose was set to 0.
+	   Added ALLOWSQLSUBSTITUTIONS to the conf and rg_database.  When running SQL scripts any hardcoded table or database names it recognizes it will change to the settings in the conf at run time.   This allows supplied SQL scripts to work both in sqlconfig.pl and in the various database management utilities.   (This was why 'use tvlistings;' was missing from the scripts - it's back in now.)
+	   Put USINGAPACHE back into the conf as my Apache detection isn't as good as I thought it was.  It's now called SUPRESSHTTPHEADER although USINGAPACHE will also work.   If mod_perl with PerlSendHeader set to ON, supresshttpheader and SUPRESSCONTENTTYPE will automatically be set to true.
+	   Removed input source from manual recording.  The protocol has it but the Replay always says the slot is unavailable if it's any value other than 3 so I suspect it's not implemented.   I've just commented it out for now.
+
+Build 198. Beta Release.	
+	   Thanks to ndrake we now have a logo :)    More logos are invited, it's not a problem to include several with the distribution.
+	   Updatetvdata now shows an estimate for data downloads, this is based on a 150 channel lineup and will vary.
+	   Both datadirect2sql and xmltv2sql give time estimates for XML to SQL conversion.   
+           Cast/Crew searches and data (on program detail) is now available.
+	   The version of replaySchedule being run is now logged and if it's less than the version tested in development of PRG there is a warning.
+	   Added code to writeLogFile to guarantee no extra newlines will be written.
+	   Important: The "channel" table has changed!    
+           Improved datadirect support for multiple lineups. 
+	   Added sqlconfig.pl for creating/updating databases.  	   
+	   Manual recording is in via the new ReplayTV menu.	    
+	   j.m. has provided a much improved getchannelicons.pl.  There is a new section in the prg.conf called geticons.
+	   Added a bunch of stuff to detect mod_perl and if you have PerlSendHeader turned on.  It should be much more pleasant under mod_perl now.
+	   Some minor bug fixes.
+
+
+Build 197. Beta Release. Added rg_null.pl which is essentially used if Replay support is disabled.
+	   Added some new functions to the 'scheduler module' "API", mostly to allow different defaults for different modules.
+           Fixed an incorrect field name when deciding if we should force an update or not.
+	   Corrected some field names in prg.conf.dist
+	   Removed the erroneous inline comment in prg.conf.dist.
+	   Added support for reading the prime time button icon
+	   For the ScheduleBar if a program is not padded significantly on either side it will not be adjusted
+	   Standardized function names
+	   Cleaned up output code
+	   Added logging to all modules 
+	   schedule.pl has been merged into the main project.   If you wish to use schedule.pl independantly of PRG you will need to base it from ind_schedule.pl which will no longer be updated aside from bug fixes.
+           Loaded modules now identify themselves
+           Added support for inline comments within the rg_config reader.
+	   Fixed, cleaned up and streamlined the RTV unit initalization in replayguide.  Should work more consistantly now.
+	   Schedule Resolver Modules (NULL, RG_GUIDE and RG_SCHEDULER) can now completely override refresh interval.
+	   Inline comments work in conf files now (# // and ; are comment characters.)
+	   Added a new script called "updatetvdata.pl" which does the download and SQL placement for either datafeed.
+	   Added new [xmltv] section to the .conf for updatetvdata.   Added new values for [datadirect] for updatetvdata.
+	   Changed DELETE FROM to TRUNCATE TABLE for ODBC/MSSQL since DELETE makes the translaction log get huge.
+	   Failed DBI functions should now fail gracefully so more useful error messages can be logged.
+	   Implemented defaultmode.  Available modes are now (default), search, todo (if your SRM supports it).  This goes in the [replayguide] section.
+	   rg_database now has a run SQL script function, eventually this will lead to some type of configure tool/installer.
+	   Added $^X (pathname to perl interpreter) so that each time we execute a Perl script with system it calls the interpreter explicitly.  This probably breaks the Perl ISAPI filter but this will be addressed before 198 is released.
+
+Build 196. Beta Release. Bug fixes.
+	   Fixed a problem with schedule.pl, rg_guide.pl and rg_replay.pl causing problems with
+	   units not being able to schedule shows!  (Eek!)
+	   Added a new check when replayguide first executes to have it force a refresh no matter
+           what so everything is set properly.
+	   Fixed a bug in configure.pl which was preventing the 'defaultkeep' value from being set.
+
+Build 195: Beta Release. 
+	   Added other authors to the byline.
+	   Added support for a centralized configuration file.
+	   Made the scheduler modules completely modular, made the original the default to ease install headaches for now. (This is actually just a test.)
+	   Added support for viewing ReplayChannels/Shows.   You can find all episodes or find repeats as well.
+	   Added support for finding repeats of a specific episode on the show details screen.
+	   Created a new Replay tool on the toolbox and removed "Refresh" and "To Do" buttons since they are now integrated.
+	   Added options to control To Do list display ranges (ALL, From Today, From Now)
+	   Added options to control To Do list's overlapping criteria (start time or end time of shows)
+	   Made a number of improvements to the tvgrid rendering routines
+	   Added a replayScheduler module SQL update to the end of the data feed to SQL process
+	   Added DataDirect support
+	   Fixed some issues with the PDA mode.
+	   Offically added SQLite support and made it the default database.  (Thanks j.m.)
+	   Locate updated to actually move the browser's display to the exact time/show.
+	   Updated database routines to allow simultaneous multiple connections to the database.
+	   Made some initial steps to move the grid generation into a plug-in structure.
+	   Added ability to search (data feed providing) other fields such as episode title, genre, etc.
+	   Made "prime time" definable in the conf file.
+	   Ensured latest XMLTV works ok (0.5.30)
+
+Build 190: Beta.  Maintenance.  
+
+Build 189: Beta.  Maintenance.  
+
+Build 188: Beta.  Maintenance.  getchannelicons.pl
+
+Build 187: Beta.  Maintenance.
+
+Build 186: Beta.  ScheduleBar added.
+
+Build 183: Beta.  ReplaySchedule integration begins.  To Do list added.
+
+Build 180: THIRD RELEASE 
+  	   Made table names soft.
+
+Build 179: Added Philip Van Baren's enhancements for displaying a single channel for 1-3 days.
+
+Build 178: SECOND RELEASE
+	   Fixed a few issues with PDA mode.
+
+Build 175: Finished new theme icon generator/conflict checker.
+	   Fixed numerous bugs in the grid mode, mostly dealing with missing data (start and end of the tvlistings)
+	   Added button to schedule a RTV guide snapshot refresh.
+           Added new .conf option to control show end overlap (see .conf.dist for details)
+
+Build 166: Added code to handle things if listings for some channels don't start at midnight on first day. 
+	   Rewrote theme icon generator.
+
+Build 165: Fixed a problem where IVS shows were being listed as events.
+	   Fixed a problem where the "first run" only disqualification was sometimes being reset.
+           Added Kevin Moye's show title comparison code which should improve hits.
+
+Build 162: Fixed "Searches need to translate HTML stuff like & to &amp; etc"
+
+Build 161: Added 'skipversioncheck' option and added some additional debugging information.
+
+Build 160: FIRST GENERAL RELEASE
+	   Added "allowtitleedit" to the replayguide.conf.   If enabled you can edit the showtitle before submitting the slot request.
+	   Removed "showpdaformat" from the .conf since it's been basically replaced with the pda= string.    SHOWPDAFORMAT can still be passed on the query string  to force PDA mode on or off.
+
+
+Build 159: Bug fixes.
+
+Build 157: LAST BETA RELEASE
+           Bug fixes, tweaking.  Improved the theme display.
+
+Build 152: Finished the channel next/prev buttons (finally ;) )
+
+
+Build 151: Theme display with conflict checking is done.   The conflict checking *only* checks the shows visible on the screen and isn't as detailed as on the ReplayTV.  Also if you have more than one Replay with overlapping themes you won't be able   to tell which unit is in conflict.   For something more comprehensive please use Kevin J. Moye's ReplaySchedule utility.
+
+Program details will now show if the program matches a theme recording.  This  is NOT conflict checked at all but it will show you which ReplayTVs have that keyword search enabled.
+
+RTV style show tracking is not possible with this design because only one program is in memory at any one moment.
+
+
+Build 148: Very very simple theme display (no conflict checks of any kind).
+	   Added LOCATE button to details/schedule screen.
+
+Build 145: Added PDA support.	
+
+Build 142: Added showrtvtext option
+	   Fixed some remaining bugs with the tvgrid.
+
+Build 141: Added support for multiple listings display modes.
+
+Build 140: Skinning/Color Support.
+	   Bug fixes.
+	   Can now have icons for ratings, audio, closed caption, etc.
+	   Can now have a title graphic.
+	   Added multiple headend support (eg. basic cable + satellite)
+
+
+

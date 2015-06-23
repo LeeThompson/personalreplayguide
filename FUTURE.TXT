@@ -1,0 +1,9 @@
+Future Enhancements for Personal ReplayGuide
+
+This document contains a list of possible future additions to this program, since this program is open source *you* are more than welcome to add/change things as you see fit as well.    This document is not binding.
+
+Ability to modify existing ReplayChannels remotely.
+Ability to delete recorded shows remotely.
+Web based administration/configuration tool
+Support for other countries and foreign program listings, if the ReplayTV isn't supported directly have show scheduling make a "Manual Recording" entry.
+

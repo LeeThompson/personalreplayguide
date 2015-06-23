@@ -1,0 +1,16 @@
+wget http://my.replaytv.com/images/x_+00-.gif
+wget http://my.replaytv.com/images/x_-00+.gif
+wget http://my.replaytv.com/images/x_+00+.gif
+wget http://my.replaytv.com/images/x_-00-.gif
+wget http://my.replaytv.com/images/x_-oo-.gif
+wget http://my.replaytv.com/images/x_+oo-.gif
+wget http://my.replaytv.com/images/x_-oo+.gif
+wget http://my.replaytv.com/images/x_+oo+.gif
+wget http://my.replaytv.com/images/x_-0-.gif
+wget http://my.replaytv.com/images/x_-o-.gif
+wget http://my.replaytv.com/images/x_+0-.gif
+wget http://my.replaytv.com/images/x_-0+.gif
+wget http://my.replaytv.com/images/x_+0+.gif
+wget http://my.replaytv.com/images/x_+o-.gif
+wget http://my.replaytv.com/images/x_-o+.gif
+wget http://my.replaytv.com/images/x_+o+.gif
