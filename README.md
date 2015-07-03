@@ -3,6 +3,9 @@ Personal ReplayGuide is a package of Perl scripts designed to provide a local, p
 
 If you're looking for a desktop application for TVlistings/ReplayTV integration this is probably overkill and you should probably check out DVArchive 3.0 (or greater).   You can find it at http://www.dvarchive.org.    It is a cross platform Java applet.
 
+Development team: Lee Thompson, Kanji T. Bates, Philip Van Baren, J.M., and Kevin J. Moye.
+
+
 This is provided for historical purposes in cause something happens to https://sourceforge.net/projects/replayguide/.
 
 This software is not under active development.
