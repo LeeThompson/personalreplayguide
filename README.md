@@ -1,8 +1,8 @@
 # personalreplayguide
 
-**NOTE: This is an archived project and is no presently active. This is provided for historical purposes in cause something happens to https://sourceforge.net/projects/replayguide - You're welcome to fork it!**
+**NOTE: This is an archived project and is not presently active. This is provided for historical purposes in cause something happens to https://sourceforge.net/projects/replayguide - You're welcome to use it or fork it!**
 
-I no longer own or use a ReplayTV so this project will likely not be updated again.    You're welcome to use it or fork it, however.   If you wish to take it over completely let me know.
+I no longer own or use a ReplayTV so this project will likely not be updated again.   If you wish to take it over completely let me know.
 
 NOTE: The documentation refers to "DataDirect".  This was a free service Zap2it (Tribune Media Services) provided until they had to close it down due to commerical application abuse.    Instead, you can use "Schedules Direct" which is a paid service ($25/year with a 7 day free trial) that should be compatible in XML mode.    To sign up or for more information, please visit: http://www.schedulesdirect.org/
 
